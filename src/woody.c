@@ -6,12 +6,11 @@ uint32_t	find_cave(char *ptr, size_t size, size_t inject)
 	size_t		cave_size;
 
 	i = 0;
-	tmp = ptr;
 	cave_size = 0;
 	while (i <= size)
 	{
 		cave_size++;
-		if (i != size && ((ptr + i) != 0 && (ptr + i) != ' '))
+		if (i != size && *(ptr + i) != 0)
 			cave_size = 0;
 		if (i == size || cave_size == inject)
 			break ;
@@ -28,7 +27,7 @@ uint32_t	get_base(Elf64_Ehdr *ehdr, char *ptr)
 	i = -1;
 	phdr = (Elf64_Phdr *)(ptr + ehdr->e_phoff);
 	while (++i < ehdr->e_phnum && phdr->p_type != 1)
-		phdr = (char *)phdr + sizeof(Elf64_Phdr);
+		phdr = (Elf64_Phdr *)((char *)phdr + sizeof(Elf64_Phdr));
 	return (phdr->p_vaddr);
 }
 
@@ -83,10 +82,10 @@ void	get_sh(char *ptr, t_woody *elf)
 	Elf64_Shdr	*hdr;
 
 	hdr = (Elf64_Shdr *)(ptr + elf->ehdr->e_shoff +
-			(elf->ehdr->e_shentsize * ehdr.e_shstrndx));
+			(elf->ehdr->e_shentsize * elf->ehdr->e_shstrndx));
 	elf->sh_strtbl_size = hdr->sh_size;
-	elf->sh_stroff = ptr + hdr->offset;
-	elf->shdr = hdr;
+	elf->sh_stroff = ptr + hdr->sh_offset;
+	elf->shdr = (Elf64_Shdr *)(ptr + elf->ehdr->e_shoff);
 }
 
 void		fill_offs(t_woody *elf, Elf64_Shdr *shdr, int cur)
@@ -99,15 +98,15 @@ void		fill_offs(t_woody *elf, Elf64_Shdr *shdr, int cur)
 }
 
 
-void		get_offs(char *ptr, t_woody *elf)
+void		get_offs(t_woody *elf)
 {
 	Elf64_Shdr	*shdr;
 	size_t		sh_num;
-	static char	**table = {SEC SEC2 SEC3};
+	static char	*table[] = {SEC SEC2 SEC3};
 	int			i;
 
-	sh_num = shdr->sh_size;
 	shdr = elf->shdr;
+	sh_num = elf->ehdr->e_shnum;
 	elf->sh_offsets = (t_offs *)malloc(sizeof(t_offs) * sh_num);
 	elf->num_offs = 0;
 	while (sh_num)
@@ -116,43 +115,47 @@ void		get_offs(char *ptr, t_woody *elf)
 		while (++i < SEC_SIZE)
 			if (!ft_strcmp(elf->sh_stroff + shdr->sh_name, table[i]))
 				break ;
-		if (i < SEC_SIZE && ++elf->nums_offs)
+		if (i < SEC_SIZE && ++elf->num_offs)
 			fill_offs(elf, shdr, elf->num_offs - 1);
 		shdr = (Elf64_Shdr *)(((char *)shdr) + sizeof(Elf64_Shdr));
 		sh_num--;
 	}
 }
 
-int			woody(char *ptr, struct stat *buf)
+int			return_error(char c, char *text)
+{
+	printf("%c", c);
+	if (!text)
+		perror("woody_woodpacker");
+	else
+		dprintf(2, "woody_woodpacker: %s\n", text);
+	return (1);
+}
+
+void	woody(char *ptr, struct stat *buf)
 {
 	t_woody		*elf;
 
 	elf = (t_woody *)malloc(sizeof(t_woody));
 	elf->ehdr = (Elf64_Ehdr *)ptr;
+	elf->file_size = (*buf).st_size;
 	if (test_magic(elf->ehdr))
 	{
 		// find cave and load shellcode should come after these functions
-		load_shellcode(elf);
-		elf->base_addr = get_base(ehdr, ptr);
+//		load_shellcode(elf);
+		elf->base_addr = get_base(elf->ehdr, ptr);
 		get_sh(ptr, elf);
-		get_offs(ptr, elf);
+		get_offs(elf);
+//		assemble_payload(ptr, elf);
 		elf->new_entry = find_cave(ptr, buf->st_size, elf->inject_size);
-		assemble_payload(ptr, elf);
-		write(1, ptr, buf->st_size + elf->inject_size);
+//		write(1, ptr, buf->st_size + elf->inject_size);
 	}
 	else
-		return_error("not an elf64 file type");
+		return_error('A', "not an elf64 file type");
+	if (munmap(ptr, elf->file_size) == -1)
+		return_error('B', NULL);
 	free(elf->sh_offsets);
 	free(elf);
-}
-
-int			return_error(char *text)
-{
-	if (!text)
-		perror("woody_woodpacker: ");
-	else
-		dprintf(2, "woody_woodpacker: %s\n", text);
-	return (1);
 }
 
 int			main(int argc, char **argv)
@@ -167,14 +170,12 @@ int			main(int argc, char **argv)
 		return (1);
 	}
 	if ((fd = open(argv[1], O_RDWR)) < 0)
-		return (return_error(NULL));
+		return (return_error('C', NULL));
 	if (syscall(5, fd, &buf) < 0)
-		return (return_error(NULL));
+		return (return_error('D', NULL));
 	if ((ptr = mmap(0, buf.st_size, PROT_READ | PROT_WRITE, MAP_PRIVATE,
 					fd, 0)) == MAP_FAILED)
-		return (return_error(NULL));
+		return (return_error('E', NULL));
 	woody(ptr, &buf);
-	if (munmap(ptr) == -1)
-		return (return_error(NULL));
 	return (0);
 }

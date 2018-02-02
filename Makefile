@@ -5,26 +5,21 @@ NASMFLAGS = -f elf64
 INC = -I include
 CFLAGS = -Wall -Werror -Wextra -g
 SRCS = woody.c
-ASMSRC = 
 
 SRC = $(addprefix src/, $(SRCS))
-ASM = $(addprefix asm_src/, $(ASMSRC))
-AOBJ = $(ASM:asm_src/%.s=asm_src/%.o)
 OBJ = $(SRC:src/%.c=src/%.o)
 
 all: $(NAME)
 
-$(NAME): $(OBJ) $(AOBJ)
-	@printf "compiled %s" $<
-
-asm_src/%.o: asm_src/%.s
-	$(NASM) $(NASMFLAGS) $< -o $@
-
-src/%.o: src/%.c
+$(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $(INC) $< -o $@
+	
+src/%.o: src/%.c
+	$(CC) $(CFLAGS) $(INC) -o $@ -c $<
+	@printf "\x1b[0;36mcompiled %s\x1b[0;39m\n" $<
 
 clean:
-	$(RM) $(AOBJ) $(OBJ)
+	$(RM) $(OBJ)
 
 fclean: clean
 	$(RM) $(NAME)
