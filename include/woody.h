@@ -10,35 +10,33 @@
 # include <stdint.h>
 # include <sys/mman.h>
 
-# define SEC ".init", ".text", ".fini", ".rodata", ".eh_frame_hdr",
-# define SEC2 ".eh_frame", ".init_array", ".fini_array", ".jrc",
-# define SEC3 ".dynamic", ".got.plt", ".data"
-# define SEC_SIZE 12
+# define APPEND_SHELLCODE 0
+# define CAVE_FOUND 1
 
-typedef struct	s_offs
-{
-	uint32_t	size;
-	uint32_t	offset;
-	uint32_t	addr;
-	int64_t		relative_off;
-	char		*name;
-}				t_offs;
+extern uint64_t	load_size;
+extern uint64_t	data_size;
+
+int				g_flag;
 
 typedef struct	s_woody
 {
-	size_t		inject_size;
+	uint64_t	key;
+	uint64_t	base_addr;
+	uint64_t	inject_size;
+	uint64_t	text_size;
 	size_t		sh_strtbl_size;
 	size_t		file_size;
 	Elf64_Ehdr	*ehdr;
 	Elf64_Shdr	*shdr;
-	t_offs		*sh_offsets;
-	uint32_t	base_addr;
 	uint32_t	new_entry;
-	char		*inject;
+	uint32_t	base_off;
+	uint32_t	text_addr;
+	uint32_t	text_off;
+	char		*load;
 	char		*sh_stroff;
-	uint8_t		num_offs;
 }				t_woody;
 
-void	encrypt(int enc, void *key, void *buf);
+extern void		decrypt(void);
+void			encrypt(int enc, void *key, void *buf);
 
 #endif

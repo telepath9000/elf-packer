@@ -1,4 +1,4 @@
 TODO:
 
-		- get encrypter/edcrypter working fo 64 bit
-		- write shellcode injection portion
+		- write asm for decrypter.
+		- fix makefile for compiling asm alongside C code.
