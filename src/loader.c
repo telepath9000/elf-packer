@@ -37,7 +37,7 @@ void	write_new_file(char *ptr, t_woody *elf)
 {
 	int		fd;
 
-	if ((fd = open("./woody", O_WRONLY | O_APPEND, S_IRWXU)) == -1)
+	if ((fd = open("./woody", O_WRONLY | O_APPEND | O_CREAT, S_IRWXU)) == -1)
 	{
 		return_error(NULL);
 		return ;

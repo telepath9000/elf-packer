@@ -2,11 +2,11 @@ NAME = woody_woodpacker
 
 SRC = src/woody.c src/loader.c src/util.c src/elf.c src/encrypt.c
 
-SRC_ASM =
+SRC_ASM = src/decrypt.asm
+
+OBJ_ASM = $(SRC_ASM:.asm=.o)
 
 OBJ = $(SRC:.c=.o)
-
-OBJ_ASM = $(SRC_ASM:.s=.o)
 
 INC = ./include
 
@@ -16,7 +16,7 @@ NASM = nasm
 
 RM = rm -f
 
-override CFLAGS += -Wall -Wextra -Werror -I$(INC)
+override CFLAGS += -Wall -Wextra -I$(INC)
 
 override NFLAGS += -f elf64
 

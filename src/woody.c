@@ -13,8 +13,10 @@ void	woody(char *ptr, struct stat *buf)
 		get_sh(ptr, elf);
 		get_off(elf);
 		encrypt_section(ptr, elf);
+		printf("the  new entry point is: %u\n", elf->new_entry);
+		printf("injecct size: %lu\n", elf->inject_size);
+		g_flag = insert_decrypt(elf);
 		elf->new_entry = find_cave(ptr, elf->file_size, elf->inject_size);
-		g_flag = insert_decrypt(ptr, elf);
 		write_new_file(ptr, elf);
 	}
 	else
