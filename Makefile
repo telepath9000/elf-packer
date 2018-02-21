@@ -1,29 +1,39 @@
 NAME = woody_woodpacker
-CC = gcc
-NASM = nasm
-NASMFLAGS = -f elf64
-INC = -I include
-CFLAGS = -Wall -Werror -Wextra -g
-SRCS = woody.c
 
-SRC = $(addprefix src/, $(SRCS))
-OBJ = $(SRC:src/%.c=src/%.o)
+SRC = src/woody.c src/loader.c src/util.c src/elf.c src/encrypt.c
+
+SRC_ASM =
+
+OBJ = $(SRC:.c=.o)
+
+OBJ_ASM = $(SRC_ASM:.s=.o)
+
+INC = ./include
+
+CC = gcc
+
+NASM = nasm
+
+RM = rm -f
+
+override CFLAGS += -Wall -Wextra -Werror -I$(INC)
+
+override NFLAGS += -f elf64
+
+$(NAME): $(OBJ) $(OBJ_ASM)
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(OBJ_ASM)
+
+$(OBJ_ASM): $(SRC_ASM)
+	$(NASM) $(NFLAGS) -o $@ $<
 
 all: $(NAME)
 
-$(NAME): $(OBJ)
-	$(CC) $(CFLAGS) $(INC) $< -o $@
-	
-src/%.o: src/%.c
-	$(CC) $(CFLAGS) $(INC) -o $@ -c $<
-	@printf "\x1b[0;36mcompiled %s\x1b[0;39m\n" $<
-
 clean:
-	$(RM) $(OBJ)
+	$(RM) $(OBJ) $(OBJ_ASM)
 
 fclean: clean
 	$(RM) $(NAME)
 
 re: fclean all
 
-.PHONY: re all clean fclean
+.PHONY: all clean fclean re

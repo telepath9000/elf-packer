@@ -1,4 +1,4 @@
-#include "woody.h"
+#include "../include/woody.h"
 
 uint64_t	get_random_key(void)
 {
@@ -21,7 +21,7 @@ void		encrypt_section(char *ptr, t_woody *elf)
 
 	elf->key = get_random_key();
 	text = ptr + elf->text_off;
-	for (int i = 0; i < elf->text_size; i++)
+	for (size_t i = 0; i < elf->text_size; i++)
 	{
 		text[i] ^= (char)tmp_key;
 		tmp_key = rotate_right(tmp_key);

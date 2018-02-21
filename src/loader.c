@@ -1,4 +1,4 @@
-#include "woody.h"
+#include "../include/woody.h"
 
 /*Elf64_Shdr	g_tmp = {
 	.sh_name = (uint32_t)0,
@@ -13,23 +13,6 @@
 	.sh_entsize = (uint64_t)0
 };*/
 
-void	*ft_memcpy(void *dst, const void *src, size_t n)
-{
-	size_t		i;
-	char		*d;
-	const char	*s;
-
-	i = 0;
-	d = (char *)dst;
-	s = (const char *)src;
-	while (i < n)
-	{
-		d[i] = s[i];
-		i++;
-	}
-	return ((void *)d);
-}
-
 void	fill_load(uint8_t *load, t_woody *elf)
 {
 	ft_memcpy(load, (void *)decrypt, load_size);
@@ -38,7 +21,7 @@ void	fill_load(uint8_t *load, t_woody *elf)
 	ft_memcpy(load + load_size - 8, &elf->text_size, sizeof(uint64_t));
 }
 
-int		insert_decrypt(char *ptr, t_woody *elf)
+int		insert_decrypt(t_woody *elf)
 {
 	elf->load = (uint8_t *)malloc(load_size);
 	fill_load(elf->load, elf);
