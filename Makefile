@@ -32,7 +32,7 @@ clean:
 	$(RM) $(OBJ) $(OBJ_ASM)
 
 fclean: clean
-	$(RM) $(NAME)
+	$(RM) $(NAME) woody
 
 re: fclean all
 

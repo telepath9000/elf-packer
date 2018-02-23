@@ -26,7 +26,8 @@ int		insert_decrypt(t_woody *elf)
 	elf->load = (uint8_t *)malloc(load_size);
 	fill_load(elf->load, elf);
 	ft_memcpy(elf->load + load_size - (data_size + 4), &elf->ehdr->e_entry, 4);
-	elf->ehdr->e_entry = elf->base_addr + (elf->base_off - elf->new_entry);
+	elf->ehdr->e_entry = elf->base_addr + ((elf->base_off - elf->new_entry) * -1);
+	printf("base_addr: %lx\nnew_entry: %lx\n", elf->base_addr, elf->ehdr->e_entry);
 	if (elf->new_entry >= elf->file_size)
 		return (APPEND_SHELLCODE);
 	else
