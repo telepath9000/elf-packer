@@ -5,7 +5,7 @@ uint64_t	get_random_key(void)
 	uint64_t	key;
 
 	syscall(__NR_getrandom, &key, 8, 0);
-	printf("key: 0x%lX\n", key);
+	printf("key: %lX\n", key);
 	return (key);
 }
 
@@ -20,6 +20,7 @@ void		encrypt_section(char *ptr, t_woody *elf)
 	uint64_t	tmp_key;
 
 	elf->key = get_random_key();
+	tmp_key = elf->key;
 	text = ptr + elf->text_off;
 	for (size_t i = 0; i < elf->text_size; i++)
 	{

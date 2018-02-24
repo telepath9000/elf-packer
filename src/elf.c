@@ -26,10 +26,8 @@ uint32_t	get_base(t_woody *elf, char *ptr)
 
 	i = -1;
 	phdr = (Elf64_Phdr *)(ptr + elf->ehdr->e_phoff);
-	printf("%u\n", elf->ehdr->e_phnum);
 	while (++i < elf->ehdr->e_phnum && phdr->p_type != 1)
 		phdr = (Elf64_Phdr *)((char *)phdr + sizeof(Elf64_Phdr));
-	printf("%lx\n", phdr->p_vaddr);
 	elf->base_off = phdr->p_offset;
 	return (phdr->p_vaddr);
 }

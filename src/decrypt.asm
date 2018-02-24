@@ -23,8 +23,7 @@ global		data_size:data
 load_size	dq		end - decrypt
 data_size	dq		end - data_start
 
-decrypt:
-
+decrypt:	
 			pushfq
 			pushx	rax, rdi, rsi, rsp, rdx, rcx
 
@@ -41,17 +40,25 @@ msg_len		equ		$ - msg
 
 unpack:
 
+			; call mprotect on text section
+			mov		rdi, [rel addr]
+			mov		rsi, [rel size]
+			mov		rdx, 7
+			mov		rax, 10
+			syscall
+
 			mov		rax, [rel addr]
 			mov		rcx, [rel size]
 			mov		rdx, [rel key]
 
 			add		rcx, rax
 
-	.loop	xor		byte [rax], dl
+loop:
+			xor		byte [rax], dl
 			ror		rdx, 8
 			inc		rax
 			cmp		rax, rcx
-			jnz		.loop
+			jnz		loop
 
 data_start:
 key:		dq		0x9999999999999999

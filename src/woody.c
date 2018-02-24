@@ -10,14 +10,11 @@ void	woody(char *ptr, struct stat *buf)
 	if (test_magic(elf->ehdr))
 	{
 		elf->base_addr = get_base(elf, ptr);
-		printf("base_addr in woody: %lx\n", elf->base_addr);
 		get_sh(ptr, elf);
 		get_off(elf);
 		encrypt_section(ptr, elf);
-		g_flag = insert_decrypt(elf);
 		elf->new_entry = find_cave(ptr, elf->file_size, load_size);
-		printf("the  new entry point is: %u\n", elf->new_entry);
-		printf("injecct size: %lu\n", load_size);
+		g_flag = insert_decrypt(elf);
 		write_new_file(ptr, elf);
 	}
 	else
