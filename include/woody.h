@@ -25,6 +25,7 @@ typedef struct	s_woody
 {
 	uint64_t	text_addr;
 	uint64_t	text_off;
+	int64_t		addr_diff;
 	uint64_t	key;
 	Elf32_Addr	base_addr;
 	uint64_t	inject_size;

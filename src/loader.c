@@ -15,11 +15,12 @@
 
 void	fill_load(uint8_t *load, t_woody *elf)
 {
+	elf->addr_diff = (int64_t)elf->text_off - (int64_t)elf->new_entry;
+	printf("%li\n", elf->addr_diff);
 	ft_memcpy(load, (void *)decrypt, load_size);
-	ft_memcpy(load + load_size - 32, &elf->key, sizeof(uint64_t));
-	ft_memcpy(load + load_size - 24, &elf->text_addr, sizeof(uint64_t));
-	ft_memcpy(load + load_size - 16, &elf->text_size, sizeof(uint64_t));
-	ft_memcpy(load + load_size - 8, &elf->new_entry, sizeof(uint64_t));
+	ft_memcpy(load + load_size - 24, &elf->key, sizeof(uint64_t));
+	ft_memcpy(load + load_size - 16, &elf->addr_diff, sizeof(uint64_t));
+	ft_memcpy(load + load_size - 8, &elf->text_size, sizeof(uint64_t));
 }
 
 int		insert_decrypt(t_woody *elf)
