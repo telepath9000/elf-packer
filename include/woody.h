@@ -24,8 +24,9 @@ int				g_flag;
 typedef struct	s_woody
 {
 	uint64_t	text_addr;
-	uint64_t	text_off;
-	int64_t		addr_diff;
+	int64_t	text_off;
+	uint64_t	addr_diff;
+	uint64_t	addr_diff_sign;
 	uint64_t	key;
 	Elf32_Addr	base_addr;
 	uint64_t	inject_size;
@@ -34,7 +35,7 @@ typedef struct	s_woody
 	size_t		file_size;
 	Elf64_Ehdr	*ehdr;
 	Elf64_Shdr	*shdr;
-	uint64_t	new_entry;
+	int64_t		new_entry;
 	uint32_t	base_off;
 	uint8_t		*load;
 	char		*sh_stroff;

@@ -9,7 +9,7 @@ int main(void)
 {
 	int 		fd;
 	struct stat buf;
-	int64_t	dest;
+	uint64_t	dest;
 	int			bytes_read;
 	char		*ptr;
 
@@ -17,7 +17,7 @@ int main(void)
 	stat("tmp", &buf);
 	ptr = (char *)calloc(buf.st_size + 1, sizeof(char));
 	read(fd, ptr, buf.st_size);
-	dest = *((int64_t *)ptr);
-	printf("%li\n", dest);
+	dest = *((uint64_t *)ptr);
+	printf("%lu\n", dest);
 	return (0);
 }
