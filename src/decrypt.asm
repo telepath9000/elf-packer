@@ -20,17 +20,18 @@ global		decrypt:function
 global		load_size:data
 global		data_size:data
 
-decrypt:
-			call	next
-next:		pop		r8
+load_size	dq		end - decrypt
+data_size	dq		end - data_start
+
+decrypt:	
 			pushfq
 			pushx	rax, rdi, rsi, rsp, rdx, rcx
 
-;			mov		rdi, 1
-;			lea		rsi, [rel msg]
-;			mov		rdx, msg_len
-;			mov		rax, rdi
-;			syscall
+			mov		rdi, 1
+			lea		rsi, [rel msg]
+			mov		rdx, msg_len
+			mov		rax, rdi
+			syscall
 
 			jmp		unpack
 
@@ -38,24 +39,30 @@ msg			db		"...WOODY...", 10, 0
 msg_len		equ		$ - msg
 
 unpack:
-		;;; replace the code ouy deleted here 
+
+			; call mprotect on text section
+			mov		rdi, [rel addr]
+			mov		rsi, [rel size]
+			mov		rdx, 7
+			mov		rax, 10
+			syscall
+
+			mov		rax, [rel addr]
+			mov		rcx, [rel size]
+			mov		rdx, [rel key]
+
+			add		rcx, rax
 
 loop:
 			xor		byte [rax], dl
 			ror		rdx, 8
 			inc		rax
 			cmp		rax, rcx
-			mov		rdi, 1
 			jnz		loop
-			popx	rax, rdi, rsi, rsp, rdx, rcx
-			jmp		r9
 
 data_start:
-sign:		dq		0x8888888888888888
 key:		dq		0x9999999999999999
 addr:		dq		0xAAAAAAAAAAAAAAAA
 size:		dq		0xBBBBBBBBBBBBBBBB
-load_size	dq		end - decrypt
-data_size	dq		end - data_start
 
 end:

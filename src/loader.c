@@ -15,27 +15,11 @@
 
 void	fill_load(uint8_t *load, t_woody *elf)
 {
-	uint64_t	load_tmp;
-	uint64_t	data_tmp;
-
-	load_tmp = load_size;
-	data_tmp = data_size;
-	elf->addr_diff_sign = 0;
-	if (elf->text_off - elf->new_entry < 0)
-	{
-		elf->addr_diff = (elf->text_off - elf->new_entry) * -1;
-		elf->addr_diff_sign = 1;
-	}
-	else
-		elf->addr_diff = elf->text_off - elf->new_entry;
-	printf("addr_off: %lu\n", elf->addr_diff);
 	ft_memcpy(load, (void *)decrypt, load_size);
-	ft_memcpy(load + load_size - 48, &elf->addr_diff_sign, sizeof(uint64_t));
-	ft_memcpy(load + load_size - 40, &elf->key, sizeof(uint64_t));
-	ft_memcpy(load + load_size - 32, &elf->addr_diff, sizeof(uint64_t));
-	ft_memcpy(load + load_size - 24, &elf->text_size, sizeof(uint64_t));
-	ft_memcpy(load + load_size - 16, &load_tmp, sizeof(uint64_t));
-	ft_memcpy(load + load_size - 8, &data_tmp, sizeof(uint64_t));
+	ft_memcpy(load + load_size - 32, &elf->key, sizeof(uint64_t));
+	ft_memcpy(load + load_size - 24, &elf->text_addr, sizeof(uint64_t));
+	ft_memcpy(load + load_size - 16, &elf->text_size, sizeof(uint64_t));
+	ft_memcpy(load + load_size - 8, &elf->new_entry, sizeof(uint64_t));
 }
 
 int		insert_decrypt(t_woody *elf)
@@ -44,7 +28,7 @@ int		insert_decrypt(t_woody *elf)
 	fill_load(elf->load, elf);
 	ft_memcpy(elf->load + load_size - (data_size + 4), &elf->ehdr->e_entry, 4);
 	elf->ehdr->e_entry = elf->base_addr + elf->new_entry;
-	if ((uint64_t)elf->new_entry >= elf->file_size)
+	if (elf->new_entry >= elf->file_size)
 		return (APPEND_SHELLCODE);
 	else
 		return (CAVE_FOUND);

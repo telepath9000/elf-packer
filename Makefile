@@ -18,7 +18,7 @@ RM = rm -f
 
 override CFLAGS += -Wall -Wextra -I$(INC)
 
-override NFLAGS += -g -f elf64
+override NFLAGS += -f elf64
 
 $(NAME): $(OBJ) $(OBJ_ASM)
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(OBJ_ASM)
