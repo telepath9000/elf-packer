@@ -1,4 +1,4 @@
-NAME = woody_woodpacker
+NAME = packer
 
 SRC = src/woody.c src/loader.c src/util.c src/elf.c src/encrypt.c
 
