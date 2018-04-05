@@ -59,10 +59,12 @@ loop:
 			inc		rax
 			cmp		rax, rcx
 			jnz		loop
+			jmp		r12
 
 data_start:
 key:		dq		0x9999999999999999
 addr:		dq		0xAAAAAAAAAAAAAAAA
 size:		dq		0xBBBBBBBBBBBBBBBB
+new_entry	dq		0xCCCCCCCCCCCCCCCC
 
 end:

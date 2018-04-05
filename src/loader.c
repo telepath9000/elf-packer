@@ -1,18 +1,5 @@
 #include "../include/woody.h"
 
-/*Elf64_Shdr	g_tmp = {
-	.sh_name = (uint32_t)0,
-	.sh_type = (uint32_t)SHT_PROGBITS,
-	.sh_flags = (uint64_t)SHF_EXECINSTR | SHF_ALLOC,
-	.sh_addr = (Elf64_Addr)0,
-	.sh_offset = (Elf64_Off)0,
-	.sh_size = (uint64_t)0,
-	.sh_link = (uint32_t)0,
-	.sh_info = (uint32_t)0,
-	.sh_addralign = (uint64_t)16,
-	.sh_entsize = (uint64_t)0
-};*/
-
 void	fill_load(uint8_t *load, t_woody *elf)
 {
 	ft_memcpy(load, (void *)decrypt, load_size);
