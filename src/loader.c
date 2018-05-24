@@ -5,8 +5,9 @@ void	fill_load(uint8_t *load, t_woody *elf)
 	uint64_t	diff;
 
 	diff = abs(elf->new_entry - elf->text_addr);
-	printf("new_entry: 0x%lx\n", elf->new_entry);
-	printf("text: 0x%lx\n", elf->text_addr);
+	printf("new_entry: %lu\n", elf->new_entry);
+	printf("text: %lu\n", elf->text_addr);
+	printf("diff: %lu\n", diff);
 	ft_memcpy(load, (void *)decrypt, load_size);
 	ft_memcpy(load + load_size - 40, &elf->key, sizeof(uint64_t));
 	ft_memcpy(load + load_size - 32, &elf->text_addr, sizeof(uint64_t));

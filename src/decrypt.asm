@@ -1,20 +1,8 @@
-%macro pushx 1-*
-	%rep %0
-		push %1
-		%rotate 1
-	%endrep
-%endmacro
-
-%macro popx 1-*
-	%rep %0
-		%rotate -1
-		pop %1
-	%endrep
-%endmacro
+		call	st
+st:
+		pop		r12
 
 [BITS 64]
-
-section .text
 
 global		decrypt:function
 global		load_size:data
@@ -24,11 +12,8 @@ load_size	dq		end - decrypt
 data_size	dq		end - data_start
 
 decrypt:
-			call st
-st:
-			pop		r12
-			mov		r11, [rel new_entry]
-			mov		r8, [rel addr]
+			mov		r11,[rel new_entry]
+			mov		r8,	[rel addr]
 			cmp		r11, r8
 			mov		r9, [rel addr_diff]
 			jae		sub_addr
@@ -39,9 +24,6 @@ sub_addr:
 add_addr:
 			add		r12, r9
 cont:
-			pushfq
-			pushx	rax, rdi, rsi, rsp, rdx, rcx
-
 			mov		rdi, 1
 			lea		rsi, [rel msg]
 			mov		rdx, msg_len
@@ -50,19 +32,19 @@ cont:
 
 			jmp		unpack
 
-msg			db		"...WOODY...", 10, 0
+msg			db		"...IwuzHEre...", 10, 0
 msg_len		equ		$ - msg
 
 unpack:
 
 			; call mprotect on text section
-			mov		rdi, [rel r12]
+			mov		rdi, r12
 			mov		rsi, [rel size]
 			mov		rdx, 7
 			mov		rax, 10
 			syscall
 
-			mov		rax, [rel r12]
+			mov		rax, r12
 			mov		rcx, [rel size]
 			mov		rdx, [rel key]
 

@@ -16,7 +16,7 @@ NASM = nasm
 
 RM = rm -f
 
-override CFLAGS += -Wall -Wextra -I$(INC)
+override CFLAGS += -Wall -Wextra -no-pie -g -I$(INC)
 
 override NFLAGS += -f elf64
 
