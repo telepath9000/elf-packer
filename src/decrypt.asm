@@ -56,6 +56,7 @@ loop:
 			inc		rax
 			cmp		rax, rcx
 			jnz		loop
+
 			jmp		r12
 
 data_start:
