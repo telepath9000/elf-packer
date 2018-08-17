@@ -1,8 +1,8 @@
 NAME = packer
 
-SRC = src/woody.c src/loader.c src/util.c src/elf.c src/encrypt.c
+SRC = src/packer.c src/encrypt.c src/prepare_elf.c src/util.c
 
-SRC_ASM = src/decrypt.asm
+SRC_ASM = src/inject.asm
 
 OBJ_ASM = $(SRC_ASM:.asm=.o)
 
@@ -16,7 +16,7 @@ NASM = nasm
 
 RM = rm -f
 
-override CFLAGS += -Wall -Wextra -no-pie -g -I$(INC)
+override CFLAGS += -Wall -Wextra -g -I$(INC)
 
 override NFLAGS += -f elf64
 
@@ -32,7 +32,7 @@ clean:
 	$(RM) $(OBJ) $(OBJ_ASM)
 
 fclean: clean
-	$(RM) $(NAME) woody
+	$(RM) $(NAME)
 
 re: fclean all
 

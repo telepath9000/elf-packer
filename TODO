@@ -1,3 +1,8 @@
 TODO:
 
-		-- getting SIGILL after running infected binary.
+		-- implement functions:
+
+				* print_error;
+				* print_error_return;
+				* destruct;
+		-- compile and debug
