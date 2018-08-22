@@ -78,7 +78,6 @@ uint64_t	find_fill_inject_point(t_elf *bin)
 	empty_space = 0;
 	empty_start_tmp = 0;
 	empty_start = -1;
-	printf("%lu\n", bin->payload_size);
 	for (i = 0; i < bin->file_size; i++) {
 		if (bin->file_ptr[i] == 0) {
 			if (empty_space == 0)
