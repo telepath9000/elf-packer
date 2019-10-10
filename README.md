@@ -1,4 +1,7 @@
 # elf-packer
+
+NOTE: In it's current stat this application does not work on current kernel versions.
+
 elf64 packer application
 
 Produces a copy of an elf64 with an encrypted text section. Self decrypts when it runs.
