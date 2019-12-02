@@ -95,6 +95,8 @@ int		write_file(t_elf *bin)
 
 void	destruct(t_elf *bin)
 {
-	free(bin->payload);
-	free(bin);
+	if (bin) {
+        free(bin->payload);
+        free(bin);
+    }
 }
