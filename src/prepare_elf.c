@@ -18,7 +18,7 @@ int			set_phdr_flags(Elf64_Ehdr *ehdr, char *file)
 			ret = 1;
 		}
 	}
-	return (ret);
+	return ret;
 }
 
 static char	*get_strtable(Elf64_Ehdr *ehdr, char *file)
@@ -26,7 +26,7 @@ static char	*get_strtable(Elf64_Ehdr *ehdr, char *file)
 	uint64_t	shdr_off;
 
 	shdr_off = ehdr->e_shoff + (ehdr->e_shstrndx * ehdr->e_shentsize);
-	return (file + (((Elf64_Shdr *)(file + shdr_off))->sh_offset));
+	return file + (((Elf64_Shdr *)(file + shdr_off))->sh_offset);
 }
 
 int			set_shdr_flags(Elf64_Ehdr *ehdr, char *file, t_elf *bin)
@@ -55,7 +55,7 @@ int			set_shdr_flags(Elf64_Ehdr *ehdr, char *file, t_elf *bin)
 			break ;
 		}
 	}
-	return (ret);
+	return ret;
 }
 
 void		prepare_payload(t_elf *bin)
@@ -101,18 +101,18 @@ uint64_t	find_fill_inject_point(t_elf *bin)
 		memcpy(bin->file_ptr + empty_start, bin->payload, bin->payload_size);
 	}
 	bin->e_hdr->e_entry = ret;
-	return (ret);
+	return ret;
 }
 
 int			prepare_file(t_elf *bin)
 {
 	if (!set_phdr_flags(bin->e_hdr, bin->file_ptr))
-		return (0);
+		return 0;
 	if (!set_shdr_flags(bin->e_hdr, bin->file_ptr, bin))
-		return (0);
+		return 0;
 	prepare_payload(bin);
 	bin->new_entry = find_fill_inject_point(bin);
-	return (1);
+	return 1;
 }
 
 int			validate_elf64(Elf64_Ehdr *hdr)
@@ -123,6 +123,6 @@ int			validate_elf64(Elf64_Ehdr *hdr)
 			hdr->e_ident[EI_MAG3] == ELFMAG3 &&
 			hdr->e_ident[EI_CLASS] == ELFCLASS64 &&
 			(hdr->e_type == ET_EXEC || hdr->e_type == ET_DYN))
-		return (1);
-	return (0);
+		return 1;
+	return 0;
 }

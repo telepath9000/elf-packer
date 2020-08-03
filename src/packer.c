@@ -25,7 +25,7 @@ void    process_elf(struct stat *statbuf, char *file_buf)
     bin = NULL;
 	if (!validate_elf64((Elf64_Ehdr *)file_buf))
 		print_error(e_elf64_fail);
-	else if ((bin = init_t_elf(file_buf, statbuf)) == NULL)
+	else if (!(bin = init_t_elf(file_buf, statbuf)))
 		print_error(e_malloc_fail);
 	else if (!prepare_file(bin))
 		print_error(e_modify_fail);
@@ -38,16 +38,14 @@ void    process_elf(struct stat *statbuf, char *file_buf)
 
 int		main(int argc, char **argv)
 {
-	t_elf		*bin;
 	struct stat	statbuf;
 	char		*file_buf;
-    int         elf_file_error;
 
 	file_buf = NULL;
 	if (argc != 2)
 		return print_error_return(e_bad_args);
-    if ((elf_file_error = prepare_elf(argv, &statbuf, file_buf)))
-        return elf_file_error;
+    if (prepare_elf(argv, &statbuf, file_buf))
+        return 1;
     process_elf(&statbuf, file_buf);
 	munmap(file_buf, statbuf.st_size);
 	return 0;
