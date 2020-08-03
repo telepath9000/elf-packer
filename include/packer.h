@@ -19,7 +19,7 @@ extern uint64_t	load_size;
 
 extern void		inject(void);
 
-enum	error_flags{e_bad_args, e_stat_fail, e_regfile_fail, e_open_fail,
+enum	error_flags {e_bad_args, e_stat_fail, e_regfile_fail, e_open_fail,
 			e_mmap_fail, e_elf64_fail, e_malloc_fail, e_modify_fail,
 			e_write_fail, e_encrypt_fail};
 
@@ -54,7 +54,7 @@ void		prepare_payload(t_elf *bin);
 int			print_error_return(int e_flag); /* returns 1 */
 void		print_error(int e_flag);
 int			write_file(t_elf *bin);
-t_elf		*init_t_elf(char *file, struct stat statbuf);
+t_elf		*init_t_elf(char *file, struct stat *statbuf);
 void		destruct(t_elf *bin);
 
 /* encrypt.c */

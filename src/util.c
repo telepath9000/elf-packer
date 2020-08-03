@@ -44,7 +44,7 @@ void	print_error(int e_flag)
 	}
 }
 
-t_elf	*init_t_elf(char *file, struct stat statbuf)
+t_elf	*init_t_elf(char *file, struct stat *statbuf)
 {
 	t_elf	*ret;
 
@@ -60,12 +60,12 @@ t_elf	*init_t_elf(char *file, struct stat statbuf)
 	ret->encrypt_off = 0;
 	ret->enc_key = gen_key();
 	ret->section_size = 0;
-	ret->file_size = statbuf.st_size;
+	ret->file_size = statbuf->st_size;
 	ret->in_file = 0;
 	ret->payload = NULL; 
 	ret->payload_size = load_size;
 	ret->file_ptr = file;
-	return (ret);
+	return ret;
 }
 
 int		write_file(t_elf *bin)
