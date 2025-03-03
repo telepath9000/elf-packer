@@ -18,7 +18,7 @@ NASM = nasm
 
 RM = rm -f
 
-override CFLAGS += -Wall -Wextra -I$(INC)
+override CFLAGS += -g -Wall -Wextra -I$(INC)
 
 override NFLAGS += -f elf64
 
@@ -26,7 +26,7 @@ $(NAME): $(OBJ) $(OBJ_ASM)
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(OBJ_ASM)
 
 $(DEBUG): $(OBJ) $(OBJ_ASM)
-	$(CC) -g $(CFLAGS) -o $(DEBUG) $(OBJ) $(OBJ_ASM)
+	$(CC) $(CFLAGS) -o $(DEBUG) $(OBJ) $(OBJ_ASM)
 
 $(OBJ_ASM): $(SRC_ASM)
 	$(NASM) $(NFLAGS) -o $@ $<
