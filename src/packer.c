@@ -10,7 +10,7 @@ int     prepare_elf(char **argv, struct stat *statbuf, char **file_buf)
 	if (!(S_ISREG(statbuf->st_mode)))
 		return (print_error_return(e_regfile_fail));
 	if ((fd = open(argv[1], O_RDONLY)) == -1)
-		return (print_error_return(e_open_fail));\
+		return (print_error_return(e_open_fail));
 	if ((*file_buf = mmap(NULL, statbuf->st_size, PROT_READ | PROT_WRITE,
                     MAP_PRIVATE, fd, 0)) == MAP_FAILED)
 		return (print_error_return(e_mmap_fail));
