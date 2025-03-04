@@ -32,25 +32,16 @@ static char	*get_strtable(Elf64_Ehdr *ehdr, char *file)
 	return file + (((Elf64_Shdr *)(file + shdr_off))->sh_offset);
 }
 
-int			set_shdr_flags(Elf64_Ehdr *ehdr, char *file, t_elf *bin)
+static int	shdr_flag_loop(t_elf *bin, Elf64_Off offset, Elf64_Off end_point, char *file, char *strtable)
 {
 	Elf64_Shdr	*shdr_cur;
-	Elf64_Off	off_cur;
-	Elf64_Off	end_point;
-	char		*strtable;
-	char		*cur_name;
-	int			ret;
+	int			shdr_exists;
 
-	ret = 0;
-	cur_name = NULL;
-	off_cur = ehdr->e_shoff;
-	end_point = (Elf64_Off)((ehdr->e_shentsize * ehdr->e_shnum) + off_cur);
-	strtable = get_strtable(ehdr, file);
-	for (; off_cur < end_point; off_cur += ehdr->e_shentsize) {
-		shdr_cur = (Elf64_Shdr *)(file + off_cur);
-		cur_name = strtable + shdr_cur->sh_name;
-		if (!strncmp(cur_name, TO_ENCRYPT, strlen(TO_ENCRYPT))) {
-			ret = 1;
+	shdr_exists = 0;
+	for (; offset < end_point; offset += bin->e_hdr->e_shentsize) {
+		shdr_cur = (Elf64_Shdr *)(file + offset);
+		if (!strncmp(strtable + shdr_cur->sh_name, TO_ENCRYPT, strlen(TO_ENCRYPT))) {
+			shdr_exists = 1;
 			bin->encrypt_off = shdr_cur->sh_offset;
 			bin->encrypt_addr = shdr_cur->sh_addr;
 			bin->section_size = shdr_cur->sh_size;
@@ -58,7 +49,17 @@ int			set_shdr_flags(Elf64_Ehdr *ehdr, char *file, t_elf *bin)
 			break ;
 		}
 	}
-	return ret;
+	return shdr_exists;
+}
+
+int			set_shdr_flags(Elf64_Ehdr *ehdr, char *file, t_elf *bin)
+{
+	Elf64_Off	end_point;
+	char		*strtable;
+
+	end_point = (Elf64_Off)((ehdr->e_shentsize * ehdr->e_shnum) + ehdr->e_shoff);
+	strtable = get_strtable(ehdr, file);
+	return shdr_flag_loop(bin, ehdr->e_shoff, end_point, file, strtable);
 }
 
 void		prepare_payload(t_elf *bin)
