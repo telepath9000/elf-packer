@@ -63,52 +63,44 @@ void		prepare_payload(t_elf *bin)
 	memcpy(bin->payload + load_size - 8, &bin->section_size, sizeof(uint64_t));
 }
 
+size_t		get_empty_space(size_t empty_space, char c)
+{
+	return c == 0 ? empty_space + 1 : 0;
+}
+
 uint64_t	find_fill_inject_point(t_elf *bin)
 {
 	size_t		empty_space;
-	size_t		empty_start_tmp;
-	long long	empty_start;
-	size_t		i;
 	uint64_t	new_start;
 
 	empty_space = 0;
-	empty_start_tmp = 0;
-	empty_start = -1;
-	for (i = 0; i < bin->file_size; i++) {
-		if (bin->file_ptr[i] == 0) {
-			if (empty_space == 0)
-				empty_start_tmp = i;
-			empty_space++;
-			if (empty_space == bin->payload_size) {
-				empty_start = empty_start_tmp;
-				break ;
-			}
-		}
-		else {
-			empty_space = 0;
+	new_start = 0;
+	for (size_t i = 0; i < bin->file_size; i++) {
+		empty_space = get_empty_space(empty_space, bin->file_ptr[i]);
+		if (empty_space == 0)
+			new_start = i;
+		if (empty_space == bin->payload_size) {
+			printf("i: %li, file_size: %li", i, bin->file_size);
+			memcpy(bin->file_ptr + new_start, bin->payload, bin->payload_size);
+			return new_start;
 		}
 	}
-	if (empty_start == -1) {
-		bin->in_file = 1;
-		new_start = bin->file_size;
-	}
-	else {
-		new_start = empty_start;
-		memcpy(bin->file_ptr + empty_start, bin->payload, bin->payload_size);
-	}
-	bin->e_hdr->e_entry = new_start;
-	return new_start;
+	return 0;
 }
 
 int			prepare_file(t_elf *bin)
 {
-	
 	if (!set_phdr_flags(bin->e_hdr, bin->file_ptr))
 		return 0;
 	if (!set_shdr_flags(bin->e_hdr, bin->file_ptr, bin))
 		return 0;
 	prepare_payload(bin);
+	/*
+	** there needs to be a guard for failure here, this can fail on memcpy if no
+	** sufficiently large gap empty space is found.
+	*/
 	bin->new_entry = find_fill_inject_point(bin);
+	bin->e_hdr->e_entry = bin->new_entry;
 	return 1;
 }
 
