@@ -27,8 +27,7 @@ void    process_elf(struct stat *statbuf, char *file_buf)
 		print_error(e_elf64_fail);
 	else if (!init_t_elf(file_buf, statbuf, &bin))
 		print_error(e_malloc_fail);
-	printf("%i\n", file_hdr->e_phentsize);
-	if (!prepare_file(&bin))
+	else if (!prepare_file(&bin))
 		print_error(e_modify_fail);
 	else if (!encrypt_section(&bin))
 		print_error(e_encrypt_fail);

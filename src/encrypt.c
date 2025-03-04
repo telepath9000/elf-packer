@@ -25,5 +25,5 @@ int			encrypt_section(t_elf *bin)
 		bin->file_ptr[i] ^= (char)key_tmp;
 		key_tmp = rotate_key(key_tmp);
 	}
-	return (1);
+	return 1;
 }

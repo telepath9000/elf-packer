@@ -1,10 +1,12 @@
+file_begin:
+
 [BITS 64]
 
 global		inject:function
 global		load_size:data
 global		data_size:data
 
-load_size	dq	end - inject
+load_size	dq	end - file_begin
 data_size	dq	end - data_start
 
 inject:

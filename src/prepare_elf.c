@@ -84,7 +84,6 @@ uint64_t	find_fill_inject_point(t_elf *bin)
 			empty_space++;
 			if (empty_space == bin->payload_size) {
 				empty_start = empty_start_tmp;
-				printf("%li\n", empty_space);
 				break ;
 			}
 		}
