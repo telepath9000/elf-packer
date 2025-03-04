@@ -48,10 +48,8 @@ int		init_t_elf(char *file, struct stat *statbuf, t_elf *bin)
 {
 	srand(time(0));
 	bin->e_hdr = (Elf64_Ehdr *)file;
-	bin->p_hdr = (bin->e_hdr->e_phoff > 0) ?
-		((Elf64_Phdr *)(file + bin->e_hdr->e_phoff)) : NULL;
-	bin->s_hdr = (bin->e_hdr->e_shoff > 0) ?
-		((Elf64_Shdr *)(file + bin->e_hdr->e_shoff)) : NULL;
+	bin->p_hdr = (bin->e_hdr->e_phoff > 0) ? ((Elf64_Phdr *)(file + bin->e_hdr->e_phoff)) : NULL;
+	bin->s_hdr = (bin->e_hdr->e_shoff > 0) ? ((Elf64_Shdr *)(file + bin->e_hdr->e_shoff)) : NULL;
 	bin->new_entry = 0;
 	bin->encrypt_addr = 0;
 	bin->encrypt_off = 0;
@@ -69,25 +67,16 @@ int		write_file(t_elf *bin)
 {
 	int		fd;
 	int		flags;
-	int		ret;
 
-	ret = 1;
-	if (bin->in_file == 1)
-		flags = (O_RDWR | O_CREAT);
-	else
-		flags = (O_WRONLY | O_CREAT | O_APPEND);
+	flags = bin->in_file == 1 ? (O_RDWR | O_CREAT) : (O_WRONLY | O_CREAT | O_APPEND);
 	if ((fd = open(NEW_FILE, flags, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)) == -1)
-		ret = 0;
-	else if (ret) {
-		if (bin->in_file == 1 && write(fd, bin->file_ptr, bin->file_size) == -1)
-			ret = 0;
-		else if (write(fd, bin->file_ptr, bin->file_size) == -1 ||
-				write(fd, bin->payload, bin->payload_size) == -1)
-			ret = 0;
-	}
-	if (ret)
-		close(fd);
-	return (ret);
+		return 0;
+	if (bin->in_file == 1 && write(fd, bin->file_ptr, bin->file_size) == -1)
+		return 0;
+	if (write(fd, bin->file_ptr, bin->file_size) == -1 || write(fd, bin->payload, bin->payload_size) == -1)
+		return 0;
+	close(fd);
+	return 1;
 }
 
 void	destruct(t_elf *bin)
