@@ -54,7 +54,7 @@ void		prepare_payload(t_elf *bin);
 int			print_error_return(int e_flag); /* returns 1 */
 void		print_error(int e_flag);
 int			write_file(t_elf *bin);
-t_elf		*init_t_elf(char *file, struct stat *statbuf);
+int			init_t_elf(char *file, struct stat *statbuf, t_elf *bin);
 void		destruct(t_elf *bin);
 
 /* encrypt.c */

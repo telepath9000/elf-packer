@@ -44,28 +44,25 @@ void	print_error(int e_flag)
 	}
 }
 
-t_elf	*init_t_elf(char *file, struct stat *statbuf)
+int		init_t_elf(char *file, struct stat *statbuf, t_elf *bin)
 {
-	t_elf	*ret;
-
 	srand(time(0));
-	ret = malloc(sizeof(t_elf));
-	ret->e_hdr = (void *)file;
-	ret->p_hdr = (ret->e_hdr->e_phoff > 0) ?
-		((void *)(file + ret->e_hdr->e_phoff)) : NULL;
-	ret->s_hdr = (ret->e_hdr->e_shoff > 0) ?
-		((void *)(file + ret->e_hdr->e_shoff)) : NULL;
-	ret->new_entry = 0;
-	ret->encrypt_addr = 0;
-	ret->encrypt_off = 0;
-	ret->enc_key = gen_key();
-	ret->section_size = 0;
-	ret->file_size = statbuf->st_size;
-	ret->in_file = 0;
-	ret->payload = NULL; 
-	ret->payload_size = load_size;
-	ret->file_ptr = file;
-	return ret;
+	bin->e_hdr = (Elf64_Ehdr *)file;
+	bin->p_hdr = (bin->e_hdr->e_phoff > 0) ?
+		((Elf64_Phdr *)(file + bin->e_hdr->e_phoff)) : NULL;
+	bin->s_hdr = (bin->e_hdr->e_shoff > 0) ?
+		((Elf64_Shdr *)(file + bin->e_hdr->e_shoff)) : NULL;
+	bin->new_entry = 0;
+	bin->encrypt_addr = 0;
+	bin->encrypt_off = 0;
+	bin->enc_key = gen_key();
+	bin->section_size = 0;
+	bin->file_size = statbuf->st_size;
+	bin->in_file = 0;
+	bin->payload = NULL; 
+	bin->payload_size = load_size;
+	bin->file_ptr = file;
+	return 1;
 }
 
 int		write_file(t_elf *bin)
@@ -95,8 +92,6 @@ int		write_file(t_elf *bin)
 
 void	destruct(t_elf *bin)
 {
-	if (bin) {
+	if (bin->payload)
         free(bin->payload);
-        free(bin);
-    }
 }

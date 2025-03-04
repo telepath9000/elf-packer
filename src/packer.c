@@ -20,21 +20,21 @@ int     prepare_elf(char **argv, struct stat *statbuf, char **file_buf)
 static
 void    process_elf(struct stat *statbuf, char *file_buf)
 {
-    t_elf   	*bin;
+    t_elf   	bin;
 	Elf64_Ehdr	*file_hdr = (Elf64_Ehdr *)file_buf;
 
-    bin = NULL;
 	if (!validate_elf64(file_hdr))
 		print_error(e_elf64_fail);
-	else if (!(bin = init_t_elf(file_buf, statbuf)))
+	else if (!init_t_elf(file_buf, statbuf, &bin))
 		print_error(e_malloc_fail);
-	else if (!prepare_file(bin))
+	printf("%i\n", file_hdr->e_phentsize);
+	if (!prepare_file(&bin))
 		print_error(e_modify_fail);
-	else if (!encrypt_section(bin))
+	else if (!encrypt_section(&bin))
 		print_error(e_encrypt_fail);
-	else if (!write_file(bin))
+	else if (!write_file(&bin))
 		print_error(e_write_fail);
-    destruct(bin);
+    destruct(&bin);
 }
 
 int		main(int argc, char **argv)

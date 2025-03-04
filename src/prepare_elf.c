@@ -13,8 +13,7 @@ int			set_phdr_flags(Elf64_Ehdr *ehdr, char *file)
 	for (; off_cur < end_point; off_cur += ehdr->e_phentsize) {
 		phdr_cur = (Elf64_Phdr *)(file + off_cur);
 		if (phdr_cur->p_type == PT_LOAD) {
-			phdr_cur->p_flags = 0;
-			phdr_cur->p_flags = 7;
+			phdr_cur->p_flags = PF_X | PF_W | PF_R;
 			ret = 1;
 		}
 	}
@@ -85,6 +84,7 @@ uint64_t	find_fill_inject_point(t_elf *bin)
 			empty_space++;
 			if (empty_space == bin->payload_size) {
 				empty_start = empty_start_tmp;
+				printf("%li\n", empty_space);
 				break ;
 			}
 		}
@@ -106,6 +106,7 @@ uint64_t	find_fill_inject_point(t_elf *bin)
 
 int			prepare_file(t_elf *bin)
 {
+	
 	if (!set_phdr_flags(bin->e_hdr, bin->file_ptr))
 		return 0;
 	if (!set_shdr_flags(bin->e_hdr, bin->file_ptr, bin))
