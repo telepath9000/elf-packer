@@ -1,23 +1,27 @@
 #include "../include/packer.h"
 
-int			set_phdr_flags(Elf64_Ehdr *ehdr, char *file)
+static int	phdr_flag_loop(Elf64_Off offset, Elf64_Off end_point, uint16_t p_block_size, char *file)
 {
 	Elf64_Phdr	*phdr_cur;
-	Elf64_Off	off_cur;
-	Elf64_Off	end_point;
-	int			ret;
+	int			phdr_exists;
 
-	ret = 0;
-	off_cur = ehdr->e_phoff;
-	end_point = (Elf64_Off)((ehdr->e_phentsize * ehdr->e_phnum) + off_cur);
-	for (; off_cur < end_point; off_cur += ehdr->e_phentsize) {
-		phdr_cur = (Elf64_Phdr *)(file + off_cur);
+	phdr_exists = 0;
+	for (; offset < end_point; offset += p_block_size) {
+		phdr_cur = (Elf64_Phdr *)(file + offset);
 		if (phdr_cur->p_type == PT_LOAD) {
 			phdr_cur->p_flags = PF_X | PF_W | PF_R;
-			ret = 1;
+			phdr_exists = 1;
 		}
 	}
-	return ret;
+	return phdr_exists;
+}
+
+int			set_phdr_flags(Elf64_Ehdr *ehdr, char *file)
+{
+	Elf64_Off	end_point;
+
+	end_point = (Elf64_Off)((ehdr->e_phentsize * ehdr->e_phnum) + ehdr->e_phoff);
+	return phdr_flag_loop(ehdr->e_phoff, end_point, ehdr->e_phentsize, file);
 }
 
 static char	*get_strtable(Elf64_Ehdr *ehdr, char *file)
