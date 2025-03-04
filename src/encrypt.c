@@ -10,7 +10,7 @@ uint64_t		gen_key(void)
 
 static uint64_t	rotate_key(uint64_t key)
 {
-	return ((key << 8) & (key >> 56));
+	return ((key << 8) | (key >> 56));
 }
 
 int			encrypt_section(t_elf *bin)
