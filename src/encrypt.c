@@ -15,14 +15,13 @@ static uint64_t	rotate_key(uint64_t key)
 
 int			encrypt_section(t_elf *bin)
 {
-	uint64_t	i;
 	uint64_t	key_tmp;
-	uint64_t	end;
+	uint64_t	*end;
 
 	key_tmp = bin->enc_key;
-	end = bin->encrypt_off + bin->section_size;
-	for (i = bin->encrypt_off; i < end; i++) {
-		bin->file_ptr[i] ^= (char)key_tmp;
+	end = (uint64_t *)(bin->file_ptr + bin->encrypt_off + bin->section_size);
+	for (uint64_t *p = (uint64_t *)(bin->file_ptr + bin->encrypt_off); p < end; p++) {
+		*p ^= key_tmp;
 		key_tmp = rotate_key(key_tmp);
 	}
 	return 1;

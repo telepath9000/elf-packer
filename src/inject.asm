@@ -29,7 +29,7 @@ cont:
 
 			add		rcx, rax
 
-	.loop	xor		byte[rax], dl
+	.loop	xor		[rax], rdx
 			ror		rdx, 8
 			inc		rax
 			cmp		rax, rcx
