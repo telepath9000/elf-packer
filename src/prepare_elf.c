@@ -68,7 +68,7 @@ size_t		get_empty_space(size_t empty_space, char c)
 	return c == 0 ? empty_space + 1 : 0;
 }
 
-uint64_t	find_fill_inject_point(t_elf *bin)
+uint64_t	inject_payload(t_elf *bin)
 {
 	size_t		empty_space;
 	uint64_t	new_start;
@@ -80,7 +80,6 @@ uint64_t	find_fill_inject_point(t_elf *bin)
 		if (empty_space == 0)
 			new_start = i;
 		if (empty_space == bin->payload_size) {
-			printf("i: %li, file_size: %li", i, bin->file_size);
 			memcpy(bin->file_ptr + new_start, bin->payload, bin->payload_size);
 			return new_start;
 		}
@@ -99,7 +98,7 @@ int			prepare_file(t_elf *bin)
 	** there needs to be a guard for failure here, this can fail on memcpy if no
 	** sufficiently large gap empty space is found.
 	*/
-	bin->new_entry = find_fill_inject_point(bin);
+	bin->new_entry = inject_payload(bin);
 	bin->e_hdr->e_entry = bin->new_entry;
 	return 1;
 }

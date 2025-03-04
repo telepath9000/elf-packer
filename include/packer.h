@@ -46,7 +46,7 @@ int			prepare_file(t_elf *bin);
 int			validate_elf64(Elf64_Ehdr *hdr);
 int			set_phdr_flags(Elf64_Ehdr *ehdr, char *file);
 int			set_shdr_flags(Elf64_Ehdr *ehdr, char *file, t_elf *bin);
-uint64_t	find_fill_inject_point(t_elf *bin);
+uint64_t	inject_payload(t_elf *bin);
 void		prepare_payload(t_elf *bin);
 
 /* util.c */
