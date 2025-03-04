@@ -1,27 +1,24 @@
 #include "../include/packer.h"
 
-static int	phdr_flag_loop(Elf64_Off offset, Elf64_Off end_point, uint16_t p_block_size, char *file)
+static int	set_phdr_flag(Elf64_Phdr *phdr_cur)
 {
-	Elf64_Phdr	*phdr_cur;
-	int			phdr_exists;
-
-	phdr_exists = 0;
-	for (; offset < end_point; offset += p_block_size) {
-		phdr_cur = (Elf64_Phdr *)(file + offset);
-		if (phdr_cur->p_type == PT_LOAD) {
-			phdr_cur->p_flags = PF_X | PF_W | PF_R;
-			phdr_exists = 1;
-		}
+	if (phdr_cur->p_type == PT_LOAD) {
+		phdr_cur->p_flags = PF_X | PF_W | PF_R;
+		return 1;
 	}
-	return phdr_exists;
+	return 0;
 }
 
 int			set_phdr_flags(Elf64_Ehdr *ehdr, char *file)
 {
 	Elf64_Off	end_point;
+	int			phdr_exists;
 
+	phdr_exists = 0;
 	end_point = (Elf64_Off)((ehdr->e_phentsize * ehdr->e_phnum) + ehdr->e_phoff);
-	return phdr_flag_loop(ehdr->e_phoff, end_point, ehdr->e_phentsize, file);
+	for (Elf64_Off offset = ehdr->e_phoff; offset < end_point; offset += ehdr->e_phentsize)
+		phdr_exists |= set_phdr_flag((Elf64_Phdr *)(file + offset));
+	return phdr_exists;
 }
 
 static char	*get_strtable(Elf64_Ehdr *ehdr, char *file)
@@ -32,24 +29,16 @@ static char	*get_strtable(Elf64_Ehdr *ehdr, char *file)
 	return file + (((Elf64_Shdr *)(file + shdr_off))->sh_offset);
 }
 
-static int	shdr_flag_loop(t_elf *bin, Elf64_Off offset, Elf64_Off end_point, char *file, char *strtable)
+static int	set_shdr_flag(Elf64_Shdr *shdr_cur, t_elf *bin, char *strtable)
 {
-	Elf64_Shdr	*shdr_cur;
-	int			shdr_exists;
-
-	shdr_exists = 0;
-	for (; offset < end_point; offset += bin->e_hdr->e_shentsize) {
-		shdr_cur = (Elf64_Shdr *)(file + offset);
-		if (!strncmp(strtable + shdr_cur->sh_name, TO_ENCRYPT, strlen(TO_ENCRYPT))) {
-			shdr_exists = 1;
-			bin->encrypt_off = shdr_cur->sh_offset;
-			bin->encrypt_addr = shdr_cur->sh_addr;
-			bin->section_size = shdr_cur->sh_size;
-			shdr_cur->sh_flags |= SHF_WRITE;
-			break ;
-		}
+	if (!strncmp(strtable + shdr_cur->sh_name, TO_ENCRYPT, strlen(TO_ENCRYPT))) {
+		bin->encrypt_off = shdr_cur->sh_offset;
+		bin->encrypt_addr = shdr_cur->sh_addr;
+		bin->section_size = shdr_cur->sh_size;
+		shdr_cur->sh_flags |= SHF_WRITE;
+		return 1;
 	}
-	return shdr_exists;
+	return 0;
 }
 
 int			set_shdr_flags(Elf64_Ehdr *ehdr, char *file, t_elf *bin)
@@ -59,7 +48,10 @@ int			set_shdr_flags(Elf64_Ehdr *ehdr, char *file, t_elf *bin)
 
 	end_point = (Elf64_Off)((ehdr->e_shentsize * ehdr->e_shnum) + ehdr->e_shoff);
 	strtable = get_strtable(ehdr, file);
-	return shdr_flag_loop(bin, ehdr->e_shoff, end_point, file, strtable);
+	for (Elf64_Off offset = ehdr->e_shoff; offset < end_point; offset += ehdr->e_shentsize)
+		if (set_shdr_flag((Elf64_Shdr *)(file + offset), bin, strtable))
+			return 1;
+	return 0;
 }
 
 void		prepare_payload(t_elf *bin)
@@ -77,7 +69,7 @@ uint64_t	find_fill_inject_point(t_elf *bin)
 	size_t		empty_start_tmp;
 	long long	empty_start;
 	size_t		i;
-	uint64_t	ret;
+	uint64_t	new_start;
 
 	empty_space = 0;
 	empty_start_tmp = 0;
@@ -98,14 +90,14 @@ uint64_t	find_fill_inject_point(t_elf *bin)
 	}
 	if (empty_start == -1) {
 		bin->in_file = 1;
-		ret = bin->file_size;
+		new_start = bin->file_size;
 	}
 	else {
-		ret = empty_start;
+		new_start = empty_start;
 		memcpy(bin->file_ptr + empty_start, bin->payload, bin->payload_size);
 	}
-	bin->e_hdr->e_entry = ret;
-	return ret;
+	bin->e_hdr->e_entry = new_start;
+	return new_start;
 }
 
 int			prepare_file(t_elf *bin)
